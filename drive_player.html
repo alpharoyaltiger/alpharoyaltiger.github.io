@@ -1,74 +1,25 @@
 <!doctype html>
 <html>
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Custom Drive Player</title>
-<style>
-  body,html{margin:0;padding:0;height:100%;background:#000;color:#fff;overflow:hidden;font-family:Arial}
-  #video-container{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#000}
-  video{width:100%;height:100%;object-fit:contain;background:#000}
-  #controls{position:fixed;bottom:0;left:0;width:100%;padding:12px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.7));box-sizing:border-box}
-  #btnPlay,#btnFull{font-size:20px;background:none;border:none;color:#fff;padding:6px;cursor:pointer}
-  #seek{width:100%;margin:8px 0}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Drive Preview Player</title>
+  <style>
+    html,body{height:100%;margin:0;background:#000}
+    .frame{width:100%;height:100vh;border:0;display:block}
+    /* optional: center loader text while iframe loads */
+    .loader{position:fixed;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;color:#ccc;font-family:Arial}
+  </style>
 </head>
 <body>
-<div id="video-container">
-  <video id="player" playsinline webkit-playsinline></video>
-</div>
-<div id="controls">
-  <button id="btnPlay">►</button>
-  <input type="range" id="seek" value="0" min="0" max="100">
-  <button id="btnFull">⤢</button>
-</div>
+  <div class="loader" id="loader">Loading video…</div>
 
-<script>
-(function(){
-  // === DRIVE FILE ID (ALREADY SET) ===
-  const FILE_ID = "1BzLfmOm_vc--rtFIZ5rHtHQf9WmAxABe";
-  const VIDEO_SRC = `https://drive.google.com/uc?export=download&id=${FILE_ID}`;
-
-  const player = document.getElementById("player");
-  const playBtn = document.getElementById("btnPlay");
-  const seekBar = document.getElementById("seek");
-  const fullBtn = document.getElementById("btnFull");
-
-  player.src = VIDEO_SRC;
-
-  player.addEventListener("loadedmetadata", () => {
-    seekBar.max = Math.floor(player.duration) || 0;
-  });
-
-  player.addEventListener("timeupdate", () => {
-    seekBar.value = Math.floor(player.currentTime);
-  });
-
-  seekBar.addEventListener("input", () => {
-    player.currentTime = seekBar.value;
-  });
-
-  playBtn.addEventListener("click", async () => {
-    try {
-      if (player.paused) { await player.play(); playBtn.textContent = "❚❚"; }
-      else { player.pause(); playBtn.textContent = "►"; }
-    } catch(e) {
-      alert("Playback blocked. Tap play again or open Drive preview.");
-    }
-  });
-
-  fullBtn.addEventListener("click", async () => {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else await player.requestFullscreen();
-    } catch(e){}
-  });
-
-  player.addEventListener('error', ()=> {
-    const link = `https://drive.google.com/file/d/${FILE_ID}/preview`;
-    alert("Cannot play directly from Drive here. Open Drive preview: " + link);
-  });
-})();
-</script>
+  <!-- REPLACE FILE_ID if you change file later -->
+  <iframe id="gdrive" class="frame"
+    src="https://drive.google.com/file/d/1BzLfmOm_vc--rtFIZ5rHtHQf9WmAxABe/preview"
+    allow="autoplay; fullscreen; encrypted-media"
+    allowfullscreen
+    onload="document.getElementById('loader').style.display='none'">
+  </iframe>
 </body>
 </html>
